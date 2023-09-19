@@ -85,7 +85,6 @@ type Data struct {
 func main() {
 	flag.Parse()
 
-	fmt.Println(allowedOriginsMap)
 	mux := http.NewServeMux()
 	mux.Handle("/data", handle(dataHandler, verbose))
 	mux.Handle("/echo", handle(echoHandler, verbose))
