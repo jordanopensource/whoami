@@ -44,7 +44,7 @@ var (
 	port              string
 	name              string
 	allowedOrigins    string
-	allowedOriginsMap map[string]bool
+	allowedOriginsMap = map[string]bool{}
 	verbose           bool
 )
 
@@ -85,6 +85,7 @@ type Data struct {
 func main() {
 	flag.Parse()
 
+	fmt.Println(allowedOriginsMap)
 	mux := http.NewServeMux()
 	mux.Handle("/data", handle(dataHandler, verbose))
 	mux.Handle("/echo", handle(echoHandler, verbose))
