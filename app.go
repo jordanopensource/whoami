@@ -133,7 +133,10 @@ func handle(next http.HandlerFunc, verbose bool) http.Handler {
 
 func allowCorsHandler(handler http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", allowedOrigins)
+		origin := r.Header.Get("Origin")
+		if strings.Contains(allowedOrigins, origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		handler(w, r)
