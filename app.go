@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -37,13 +38,14 @@ var upgrader = websocket.Upgrader{
 }
 
 var (
-	cert           string
-	key            string
-	ca             string
-	port           string
-	name           string
-	allowedOrigins string
-	verbose        bool
+	cert              string
+	key               string
+	ca                string
+	port              string
+	name              string
+	allowedOrigins    string
+	allowedOriginsMap = map[string]bool{}
+	verbose           bool
 )
 
 func init() {
@@ -54,6 +56,17 @@ func init() {
 	flag.StringVar(&port, "port", getEnv("WHOAMI_PORT_NUMBER", "80"), "give me a port number")
 	flag.StringVar(&name, "name", os.Getenv("WHOAMI_NAME"), "give me a name")
 	flag.StringVar(&allowedOrigins, "allowed-origins", os.Getenv("WHOAMI_ALLOWED_ORIGINS"), "give me a list of allowed origins")
+	parseAllowedOringins()
+}
+
+func parseAllowedOringins() {
+	_allowedOrigins := strings.Split(
+		regexp.MustCompile(`\s*,\s*`).ReplaceAllString(allowedOrigins, ","),
+		",",
+	)
+	for _, allowedOrigin := range _allowedOrigins {
+		allowedOriginsMap[allowedOrigin] = true
+	}
 }
 
 // Data whoami information.
@@ -133,7 +146,7 @@ func handle(next http.HandlerFunc, verbose bool) http.Handler {
 
 func allowCorsHandler(handler http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if origin := r.Header.Get("Origin"); strings.Contains(allowedOrigins, origin) {
+		if origin := r.Header.Get("Origin"); allowedOriginsMap[origin] || allowedOriginsMap["*"] {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
