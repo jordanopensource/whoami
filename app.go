@@ -32,7 +32,7 @@ const (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
+	CheckOrigin: func(_ *http.Request) bool {
 		return true
 	},
 }
@@ -104,7 +104,7 @@ func main() {
 		Handler: mux,
 	}
 
-	if len(ca) > 0 {
+	if ca != "" {
 		server.TLSConfig = setupMutualTLS(ca)
 	}
 
@@ -236,7 +236,7 @@ func whoamiHandler(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 
 	wait := queryParams.Get("wait")
-	if len(wait) > 0 {
+	if wait != "" {
 		duration, err := time.ParseDuration(wait)
 		if err == nil {
 			time.Sleep(duration)
