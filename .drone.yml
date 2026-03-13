@@ -1,6 +1,0 @@
-kind: template
-load: container.jsonnet
-data:
-  repositoryName: josaorg/whoami
-  releaseName: whoami
-  buildArgs:
